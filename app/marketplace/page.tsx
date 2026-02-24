@@ -1,16 +1,8 @@
 "use client";
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
+import { MOCK_PRODUCE } from '../data/products';
 
-const MOCK_PRODUCE = [
-  { id: 1, name: 'Red Onions', variety: 'Nashik', price: 28, grade: 'A', tags: ['Organic'], farmer: 'Suresh K.', image: '🧅' },
-  { id: 2, name: 'Hybrid Tomatoes', variety: 'Bangalore', price: 32, grade: 'A', tags: ['Pesticide Free'], farmer: 'Ramesh G.', image: '🍅' },
-  { id: 3, name: 'Desi Potatoes', variety: 'Indore', price: 22, grade: 'B', tags: ['Seasonal'], farmer: 'Amit P.', image: '🥔' },
-  { id: 4, name: 'Green Chillies', variety: 'Guntur', price: 45, grade: 'A', tags: ['Export Quality'], farmer: 'Vikas M.', image: '🌶️' },
-  { id: 5, name: 'Cauliflower', variety: 'Local', price: 40, grade: 'C', tags: ['Pesticide Free'], farmer: 'Sunil J.', image: '🥦' },
-  { id: 6, name: 'Garlic', variety: 'MP White', price: 120, grade: 'A', tags: ['Organic'], farmer: 'Deepak S.', image: '🧄' },
-  { id: 7, name: 'Lady Finger', variety: 'Bhindi', price: 55, grade: 'A', tags: ['Fresh'], farmer: 'Rahul T.', image: '🎋' },
-  { id: 8, name: 'Carrots', variety: 'Ooty', price: 65, grade: 'A', tags: ['Organic'], farmer: 'Kiran V.', image: '🥕' },
-];
 
 const QUICK_VEG_TAGS = ['All', 'Onion', 'Tomato', 'Potato', 'Garlic', 'Carrots', 'Chillies'];
 

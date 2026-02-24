@@ -1,46 +1,19 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { MOCK_PRODUCE } from '../../data/products';
 
 export default function ProductDetail() {
+  const params = useParams();
   const [quantity, setQuantity] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
-  
-  // Updated Sample Data
-  const product = {
-    name: "Red Onions (Nashik)",
-    farmer: "Suresh Kendrick",
-    location: "Kalwan, Nashik",
-    price: 28,
-    retailPrice: 42,
-    grade: "A",
-    harvestDate: "22 Feb 2026",
-    stock: "450 kg",
-    tags: ["Organic", "Export Quality"],
-    description: "These onions are grown using zero-budget spiritual farming. They have a high pungency level and a shelf life of 4+ months if stored in a cool, dry place.",
-    // NEW: Product Highlights
-    highlights: [
-      { bold: "FARM FRESH:", text: "Harvested within 24 hours of your order." },
-      { bold: "NO MIDDLEMEN:", text: "Sourced directly from the Kalwan farm belt." },
-      { bold: "LONG SHELF LIFE:", text: "Naturally cured for better storage at home." },
-      { bold: "LAB TESTED:", text: "Certified pesticide-free and organic." }
-    ],
-    // NEW: Technical Details
-    specs: {
-      "Variety": "Nasik Red (Gavran)",
-      "Size": "55mm - 65mm",
-      "Packaging": "Mesh Bags (Jali)",
-      "Pungency": "High",
-      "Origin": "Maharashtra, India"
-    }
-  };
 
-  // Dummy Images Array
-  const images = [
-    "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=800&q=80", // Main Onion
-    "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80", // Field
-    "https://images.unsplash.com/photo-1590779033100-9f60705a2f3b?auto=format&fit=crop&w=800&q=80", // Basket
-  ];
+  // Use the ID from the URL to find the specific item
+  const product = MOCK_PRODUCE.find((item) => item.id === Number(params.id));
+
+  // Safety check if user types a wrong ID in the URL
+  if (!product) return <div className="p-20 text-center">Product not found.</div>;
 
   const savings = ((product.retailPrice - product.price) / product.retailPrice) * 100;
 
@@ -60,7 +33,7 @@ export default function ProductDetail() {
           {/* MAIN IMAGE DISPLAY */}
           <div className="relative aspect-square bg-gray-50 rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100">
             <img 
-              src={images[activeImg]} 
+              src={product.gallery[activeImg]} 
               alt="Produce" 
               className="w-full h-full object-cover"
             />
@@ -68,7 +41,7 @@ export default function ProductDetail() {
 
           {/* DUMMY IMAGE GALLERY STRIP */}
           <div className="flex gap-4">
-            {images.map((img, i) => (
+            {product.gallery.map((img, i) => (
               <button 
                 key={i}
                 onClick={() => setActiveImg(i)}

@@ -45,9 +45,9 @@ export default function Home() {
           <Link href="/list-produce" className="bg-[#64DD17] text-black font-black px-10 py-5 rounded-2xl shadow-xl hover:scale-105 transition-transform text-center">
             I AM A FARMER
           </Link>
-          <button className="bg-slate-900 text-white font-black px-10 py-5 rounded-2xl shadow-xl hover:scale-105 transition-transform">
+          <Link href="/marketplace" className="bg-slate-900 text-white font-black px-10 py-5 rounded-2xl shadow-xl hover:scale-105 transition-transform">
             I AM A BUYER
-          </button>
+          </Link>
         </div>
       </header>
 
