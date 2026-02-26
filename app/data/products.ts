@@ -50,7 +50,9 @@ export const MOCK_PRODUCE = [
     harvestDate: "24 Feb 2026",
     stock: "1200 kg",
     description: "Deep red, firm tomatoes ideal for retail and long-distance transport.",
-    gallery: ["https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=800"],
+    gallery: ["https://5.imimg.com/data5/SELLER/Default/2020/8/AY/JD/IA/21200526/potato.jpeg",
+              "https://5.imimg.com/data5/SELLER/Default/2020/8/LX/LX/EF/21200526/fresh-tomato-1st-quality.jpeg",
+    ],
     highlights: [
       { bold: "HYDROPONIC:", text: "Controlled environment growth." },
       { bold: "RICH LYCOPENE:", text: "Deep red pigment for health." }

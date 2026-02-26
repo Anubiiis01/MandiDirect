@@ -6,16 +6,32 @@ export default function Home() {
     <div className="min-h-screen bg-white text-slate-900 font-sans">
       {/* 1. NAVIGATION */}
       <nav className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center border-b border-gray-50 sticky top-0 bg-white/80 backdrop-blur-md z-50">
-        <h1 className="text-2xl font-black text-[#2E7D32] tracking-tighter">MandiDirect 2.0</h1>
-        <div className="hidden md:flex gap-8 text-sm font-bold text-gray-600">
-          <a href="#" className="hover:text-[#2E7D32]">How it works</a>
-          <a href="#" className="hover:text-[#2E7D32]">Market Prices</a>
-          <a href="#" className="hover:text-[#2E7D32]">Support</a>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs font-bold bg-gray-100 px-3 py-1.5 rounded-full text-gray-500">📍 Navi Mumbai</span>
-        </div>
-      </nav>
+  <h1 className="text-2xl font-black text-[#2E7D32] tracking-tighter">MandiDirect 2.0</h1>
+  
+  <div className="hidden md:flex gap-8 text-sm font-bold text-gray-600">
+    <a href="#" className="hover:text-[#2E7D32] transition-colors">How it works</a>
+    <a href="#" className="hover:text-[#2E7D32] transition-colors">Market Prices</a>
+    <a href="#" className="hover:text-[#2E7D32] transition-colors">Support</a>
+  </div>
+
+  <div className="flex items-center gap-6">
+    {/* Location Tag */}
+    <span className="hidden sm:inline-flex text-[11px] font-black bg-gray-100 px-3 py-1.5 rounded-full text-gray-500 uppercase tracking-tight">
+      📍 Navi Mumbai
+    </span>
+
+    {/* Auth Buttons */}
+    <div className="flex items-center gap-3">
+      
+      <Link 
+        href="/auth" 
+        className="bg-[#2E7D32] hover:bg-[#1b5e20] text-white text-sm font-black px-6 py-2.5 rounded-full shadow-lg shadow-green-900/10 transition-all active:scale-95"
+      >
+        Join Mandi
+      </Link>
+    </div>
+  </div>
+</nav>
 
       {/* 2. MARKET TICKER */}
       <div className="bg-[#2E7D32] text-white py-3 overflow-hidden whitespace-nowrap relative">
