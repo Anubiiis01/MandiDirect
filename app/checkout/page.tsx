@@ -58,9 +58,15 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <button className="place-order-btn">
-            Place Your Order & Pay
-          </button>
+          <Link href="/checkout" className="btn-go-checkout overflow-hidden relative group">
+  {/* The Shimmer Layer */}
+  <div className="shimmer-effect"></div>
+  
+  <span className="relative z-10 flex items-center gap-2">
+    Proceed to Checkout 
+    <span className="arrow-icon">→</span>
+  </span>
+</Link>
         </section>
 
         {/* RIGHT COLUMN: Order Summary (The "Sticky" Sidebar) */}
@@ -282,6 +288,77 @@ export default function CheckoutPage() {
   text-align: center;
   max-width: 400px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+
+.btn-go-checkout {
+  background: #64DD17;
+  color: black !important;
+  padding: 1rem 2rem;
+  border-radius: 1.25rem;
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 15px rgba(100, 221, 23, 0.3);
+}
+
+/* Hover State: Lift and Glow */
+.btn-go-checkout:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 20px rgba(100, 221, 23, 0.4);
+  background: #76ff03;
+}
+
+/* The Shimmering Glare Effect */
+.shimmer-effect {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: 0.5s;
+}
+
+.btn-go-checkout:hover .shimmer-effect {
+  animation: shimmer 1.2s infinite;
+}
+
+/* Arrow Animation */
+.arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.btn-go-checkout:hover .arrow-icon {
+  transform: translateX(5px);
+}
+
+/* Keyframes for the Shimmer */
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 150%; }
+}
+
+/* Continuous Pulse for Visibility */
+@keyframes pulse-soft {
+  0% { box-shadow: 0 0 0 0 rgba(100, 221, 23, 0.5); }
+  70% { box-shadow: 0 0 0 15px rgba(100, 221, 23, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(100, 221, 23, 0); }
+}
+
+.btn-go-checkout {
+  animation: pulse-soft 2s infinite;
 }
       `}</style>
     </div>
