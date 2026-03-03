@@ -1,12 +1,15 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { MOCK_PRODUCE } from '../../data/products';
 
 export default function ProductDetail() {
   const params = useParams();
+  const router = useRouter(); // <--- Add this (Import from 'next/navigation')
   const [activeImg, setActiveImg] = useState(0);
+  const [quantity, setQuantity] = useState(1); // <--- Add this
+  const [showCartBar, setShowCartBar] = useState(false);
   
   const product = MOCK_PRODUCE.find((p) => p.id === Number(params.id));
 
@@ -775,6 +778,205 @@ export default function ProductDetail() {
             transition-duration: 0.01ms !important;
           }
         }
+
+
+        
+        .cart-notification-bar {
+          position: fixed;
+          bottom: 2rem;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 90%;
+          max-width: 1100px;
+          background: #131921; /* Dark theme to contrast your white page */
+          border-radius: 1.5rem;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+          z-index: 999;
+          animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cart-bar-content {
+          padding: 1rem 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .cart-item-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .cart-thumb {
+          width: 50px;
+          height: 50px;
+          object-fit: cover;
+          border-radius: 0.5rem;
+          background: white;
+        }
+
+        .added-label {
+          display: block;
+          font-size: 0.65rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .cart-product-name {
+          color: white;
+          font-weight: 700;
+          font-size: 0.9rem;
+        }
+
+        .cart-stats {
+          display: flex;
+          gap: 3rem;
+          border-left: 1px solid rgba(255,255,255,0.1);
+          border-right: 1px solid rgba(255,255,255,0.1);
+          padding: 0 3rem;
+        }
+
+        .stat-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .stat-label {
+          font-size: 0.65rem;
+          color: #94A3B8;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .stat-value {
+          color: white;
+          font-weight: 900;
+          font-size: 1.25rem;
+        }
+
+        .stat-value.highlight {
+          color: #64DD17;
+          font-style: italic;
+        }
+
+        .cart-actions {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+
+        .btn-close-bar {
+          background: none;
+          border: none;
+          color: #94A3B8;
+          font-size: 0.75rem;
+          font-weight: 800;
+          cursor: pointer;
+          text-transform: uppercase;
+        }
+
+        .btn-go-checkout {
+          background: #64DD17;
+          color: black;
+          padding: 0.75rem 1.5rem;
+          border-radius: 1rem;
+          font-weight: 900;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          transition: transform 0.2s;
+        }
+
+        .btn-go-checkout:hover {
+          transform: scale(1.05);
+          color: black !important;
+        }
+
+        @keyframes slideUp {
+          from { transform: translate(-50%, 100%); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+          .cart-bar-content { flex-direction: column; gap: 1rem; padding: 1.5rem; }
+          .cart-stats { border: none; padding: 0; gap: 2rem; }
+          .cart-actions { gap: 1rem; }
+        }
+
+
+
+        .quantity-stepper-container {
+  margin-bottom: 1.5rem;
+}
+
+.quantity-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--md-slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.stepper-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--md-slate-50);
+  border: 2px solid var(--md-slate-100);
+  border-radius: var(--md-radius-xl);
+  overflow: hidden;
+  padding: 0.25rem;
+}
+
+.stepper-btn {
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: none;
+  border-radius: calc(var(--md-radius-xl) - 4px);
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--md-slate-900);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.stepper-btn:hover {
+  background: var(--md-green-light);
+  color: var(--md-green-dark);
+  transform: scale(0.95);
+}
+
+.stepper-btn:active {
+  transform: scale(0.9);
+}
+
+.quantity-display {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.qty-number {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--md-slate-900);
+  line-height: 1;
+}
+
+.qty-unit {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--md-slate-400);
+  text-transform: uppercase;
+}
       `}</style>
 
       <div className="product-page-container">
@@ -930,15 +1132,44 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              <select className="quantity-select" aria-label="Select quantity">
-                <option>Quantity: 1</option>
-                <option>Quantity: 2</option>
-                <option>Quantity: 5</option>
-                <option>Quantity: 10</option>
-              </select>
+              {/* Replace your current quantity select and buttons with this */}
+<div className="quantity-stepper-container">
+  <p className="quantity-label">Select Quantity</p>
+  <div className="stepper-wrapper">
+    <button 
+      className="stepper-btn" 
+      onClick={() => setQuantity(q => Math.max(1, q - 1))}
+      aria-label="Decrease quantity"
+    >
+      −
+    </button>
+    <div className="quantity-display">
+      <span className="qty-number">{quantity}</span>
+      <span className="qty-unit">Units</span>
+    </div>
+    <button 
+      className="stepper-btn" 
+      onClick={() => setQuantity(q => q + 1)}
+      aria-label="Increase quantity"
+    >
+      +
+    </button>
+  </div>
+</div>
 
-              <button className="btn-cart">🛒 Add to Cart</button>
-              <button className="btn-buy">⚡ Buy Now</button>
+<button 
+  className="btn-cart" 
+  onClick={() => setShowCartBar(true)}
+>
+  🛒 Add to Cart
+</button>
+
+<button 
+  className="btn-buy"
+  onClick={() => router.push('/checkout')}
+>
+  ⚡ Buy Now
+</button>
 
               <div className="gift-checkbox">
                 <input type="checkbox" id="gift-options" />
@@ -952,6 +1183,40 @@ export default function ProductDetail() {
           </section>
         </div>
       </div>
+      {/* --- FLOATING MINI-CART BAR --- */}
+      {showCartBar && (
+        <div className="cart-notification-bar">
+          <div className="cart-bar-content">
+            <div className="cart-item-info">
+              <img src={product.gallery?.[0]} alt="thumbnail" className="cart-thumb" />
+              <div>
+                <span className="added-label text-[#64DD17]">✓ Added to Cart</span>
+                <p className="cart-product-name">{product.name}</p>
+              </div>
+            </div>
+
+            <div className="cart-stats">
+              <div className="stat-group">
+                <span className="stat-label">Quantity</span>
+                <span className="stat-value">x{quantity}</span>
+              </div>
+              <div className="stat-group">
+                <span className="stat-label">Subtotal</span>
+                <span className="stat-value highlight">₹{product.price * quantity}</span>
+              </div>
+            </div>
+
+            <div className="cart-actions">
+              <button onClick={() => setShowCartBar(false)} className="btn-close-bar">
+                Continue Shopping
+              </button>
+              <Link href="/checkout" className="btn-go-checkout">
+                Proceed to Checkout
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
