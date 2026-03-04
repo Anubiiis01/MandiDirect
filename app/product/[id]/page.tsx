@@ -10,8 +10,29 @@ export default function ProductDetail() {
   const [activeImg, setActiveImg] = useState(0);
   const [quantity, setQuantity] = useState(1); // <--- Add this
   const [showCartBar, setShowCartBar] = useState(false);
-  
   const product = MOCK_PRODUCE.find((p) => p.id === Number(params.id));
+
+  const handleBuyNow = () => {
+  if (!product) return;
+  const itemsTotal = product.price * quantity;
+  const platformFee = 5.00; // Constant fee
+  const grandTotal = itemsTotal + platformFee;
+
+  const orderSummary = {
+    itemsTotal: itemsTotal,
+    platformFee: platformFee,
+    grandTotal: grandTotal,
+    quantity: quantity,
+    productName: product.name,
+    productImg: product.gallery[0]
+  };
+
+  // Save to storage so checkout can read it
+  localStorage.setItem('mandi_order_summary', JSON.stringify(orderSummary));
+  
+  // Navigate to checkout
+  router.push('/checkout');
+};
 
   if (!product) {
     return (
@@ -1134,42 +1155,31 @@ export default function ProductDetail() {
 
               {/* Replace your current quantity select and buttons with this */}
 <div className="quantity-stepper-container">
-  <p className="quantity-label">Select Quantity</p>
-  <div className="stepper-wrapper">
-    <button 
-      className="stepper-btn" 
-      onClick={() => setQuantity(q => Math.max(1, q - 1))}
-      aria-label="Decrease quantity"
-    >
-      −
-    </button>
-    <div className="quantity-display">
-      <span className="qty-number">{quantity}</span>
-      <span className="qty-unit">Units</span>
+      <p className="quantity-label">Select Quantity</p>
+      <div className="stepper-wrapper">
+        <button 
+          className="stepper-btn" 
+          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+        > − </button>
+        <div className="quantity-display">
+          <span className="qty-number">{quantity}</span>
+          <span className="qty-unit">{'kg'}</span>
+        </div>
+        <button 
+          className="stepper-btn" 
+          onClick={() => setQuantity(quantity + 1)}
+        > + </button>
+      </div>
     </div>
-    <button 
-      className="stepper-btn" 
-      onClick={() => setQuantity(q => q + 1)}
-      aria-label="Increase quantity"
-    >
-      +
+
+    {/* ACTION BUTTONS */}
+    <button className="btn-cart" onClick={() => setShowCartBar(true)}>
+      🛒 Add to Cart
     </button>
-  </div>
-</div>
-
-<button 
-  className="btn-cart" 
-  onClick={() => setShowCartBar(true)}
->
-  🛒 Add to Cart
-</button>
-
-<button 
-  className="btn-buy"
-  onClick={() => router.push('/checkout')}
->
-  ⚡ Buy Now
-</button>
+    
+    <button className="btn-buy" onClick={handleBuyNow}>
+      ⚡ Buy Now
+    </button>
 
               <div className="gift-checkbox">
                 <input type="checkbox" id="gift-options" />
@@ -1183,40 +1193,38 @@ export default function ProductDetail() {
           </section>
         </div>
       </div>
-      {/* --- FLOATING MINI-CART BAR --- */}
       {showCartBar && (
-        <div className="cart-notification-bar">
-          <div className="cart-bar-content">
-            <div className="cart-item-info">
-              <img src={product.gallery?.[0]} alt="thumbnail" className="cart-thumb" />
-              <div>
-                <span className="added-label text-[#64DD17]">✓ Added to Cart</span>
-                <p className="cart-product-name">{product.name}</p>
-              </div>
-            </div>
-
-            <div className="cart-stats">
-              <div className="stat-group">
-                <span className="stat-label">Quantity</span>
-                <span className="stat-value">x{quantity}</span>
-              </div>
-              <div className="stat-group">
-                <span className="stat-label">Subtotal</span>
-                <span className="stat-value highlight">₹{product.price * quantity}</span>
-              </div>
-            </div>
-
-            <div className="cart-actions">
-              <button onClick={() => setShowCartBar(false)} className="btn-close-bar">
-                Continue Shopping
-              </button>
-              <Link href="/checkout" className="btn-go-checkout">
-                Proceed to Checkout
-              </Link>
-            </div>
-          </div>
+  <div className="cart-notification-bar">
+    <div className="cart-bar-content">
+      <div className="cart-item-info">
+        <img src={product.gallery[0]} className="cart-thumb" alt="thumb" />
+        <div>
+          <span className="added-label" style={{color: '#64DD17'}}>Added to Cart</span>
+          <span className="cart-product-name">{product.name}</span>
         </div>
-      )}
+      </div>
+
+      <div className="cart-stats">
+        <div className="stat-group">
+          <span className="stat-label">Qty</span>
+          <span className="stat-value">{quantity}</span>
+        </div>
+        <div className="stat-group">
+          <span className="stat-label">Subtotal</span>
+          <span className="stat-value highlight">₹{(product.price * quantity).toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div className="cart-actions">
+        <button className="btn-close-bar" onClick={() => setShowCartBar(false)}>Close</button>
+        {/* We trigger handleBuyNow here to sync the data before moving */}
+        <button className="btn-go-checkout" onClick={handleBuyNow}>
+          Proceed to Checkout →
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </>
   );
 }
