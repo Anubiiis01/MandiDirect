@@ -80,16 +80,16 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="group bg-slate-900 rounded-[2.5rem] p-10 hover:shadow-2xl transition-all cursor-pointer h-[400px] flex flex-col justify-between text-white">
-          <div>
-            <span className="text-4xl">🚛</span>
-            <h3 className="text-3xl font-black mt-6">Wholesale Hub</h3>
-            <p className="text-slate-400 mt-2 font-medium">Buying for a business? Access tiered pricing and bulk logistics.</p>
-          </div>
-          <div className="flex items-center gap-2 font-bold text-[#64DD17]">
-            View Bulk Rates <span>→</span>
-          </div>
-        </div>
+        <Link href="/wholesale/select-city" className="group bg-slate-900 rounded-[2.5rem] p-10 hover:shadow-2xl transition-all cursor-pointer h-[400px] flex flex-col justify-between text-white">
+    <div>
+      <span className="text-4xl">🚛</span>
+      <h3 className="text-3xl font-black mt-6">Wholesale Hub</h3>
+      <p className="text-slate-400 mt-2 font-medium">Buying for a business? Access tiered pricing and bulk logistics.</p>
+    </div>
+    <div className="flex items-center gap-2 font-bold text-[#64DD17]">
+      View Bulk Rates <span>→</span>
+    </div>
+  </Link>
       </section>
 
       <style jsx>{`
