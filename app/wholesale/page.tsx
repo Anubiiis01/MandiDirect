@@ -21,8 +21,8 @@ const wholesaleData = useMemo(() => ({
   "Meat & Poultry": { icon: "🍗", subs: ["Chicken", "Beef", "Pork", "Lamb", "Deli Meats"], brand: "PrimeCut Wholesale" },
   Seafood: { icon: "🐟", subs: ["White Fish", "Salmon", "Shrimp & Prawns", "Shellfish", "Canned/Processed Seafood"], brand: "Ocean Direct Bulk" },
   "Bakery & Bread": { icon: "🍞", subs: ["Sliced Loaves", "Burger Buns & Slider Rolls", "Baguettes & Artisan Loaves", "Tortillas & Flatbreads", "Pastries"], brand: "Artisan Bake Supply" },
-  "Grains & Legumes": { icon: "🌾", subs: ["Rice", "Lentils", "Beans", "Quinoa & Couscous", "Oats"], brand: "Harvest Gold Wholesale" },
-  "Flour & Baking Supplies": { icon: "🥣", subs: ["All-Purpose & Bread Flour", "Sugars", "Yeast & Leavening Agents", "Cocoa Powder & Chocolate Chips", "Cooking Fats"], brand: "Baker's Choice Pro" },
+  "Grains & Legumes": { icon: "🌾", subs: ["Rice", "Lentils", "Beans", "Wheat","Barley", "Oats"], brand: "Harvest Gold Wholesale" },
+  "Flour & Baking Supplies": { icon: "🥣", subs: ["All-Purpose", "Bread Flour", "Sugars", "Yeast & Leavening Agents", "Cocoa Powder ", "Chocolate Chips", "Baking Powder"], brand: "Baker's Choice Pro" },
   "Spices & Seasonings": { icon: "🧂", subs: ["Salt", "Peppercorns", "Herbs", "Ground Spices", "Spice Blends"], brand: "Spice Route Bulk" },
   "Canned & Jarred Goods": { icon: "🥫", subs: ["Tomato Products", "Canned Vegetables", "Pickles & Olives", "Pasta Sauces & Pesto", "Fruit Preserves & Jams"], brand: "Pantry Plus Wholesale" },
   "Soft Drinks & Sodas": { icon: "🥤", subs: ["Cola & Diet Sodas", "Lemon-Lime & Ginger Ales", "Energy Drinks", "Flavored Sparkling Waters", "Iced Teas"], brand: "FizzCo Distribution" },
@@ -33,7 +33,7 @@ const wholesaleData = useMemo(() => ({
   "Snacks & Confectionery": { icon: "🍫", subs: ["Potato Chips & Pretzels", "Nuts & Trail Mixes", "Chocolate Bars & Candies", "Biscuits & Cookies", "Protein & Granola Bars"], brand: "SnackHub Distribution" },
   "Packaging & Disposables": { icon: "📦", subs: ["Takeout Containers", "Disposable Cutlery", "Napkins & Paper Tissues", "Paper Cups & Lids", "Grocery & Carrier Bags"], brand: "PackPro Wholesale" },
   "Cleaning Supplies": { icon: "🧼", subs: ["Dish Soap & Detergents", "Multi-Surface Sanitizers", "Floor Cleaners & Degreasers", "Bleach & Disinfectants", "Hand Soaps & Sanitisers"], brand: "CleanForce Bulk" },
-  "Syrups & Concentrates": { icon: "🍯", subs: ["Coffee Syrups", "Soda Fountain Concentrates", "Maple & Pancake Syrups", "Cordials", "Agave & Fruit Nectars"], brand: "SyrupCo Wholesale" },
+  "Syrups & Concentrates": { icon: "🍯", subs: ["Fruit Syrups", "Soda Fountain Concentrates", "Maple & Pancake Syrups", "Cordials", "Agave & Fruit Nectars"], brand: "SyrupCo Wholesale" },
   "Garnish & Toppings": { icon: "🍒", subs: ["Cocktail Garnishes", "Sprinkles & Dessert Toppings", "Salad Toppings", "Dried Fruit Slices", "Whipped Cream"], brand: "Garnish Pro Supply" },
   "Kitchen Hardware": { icon: "🔧", subs: ["Aluminum Foil & Cling Film", "Parchment & Wax Paper", "Disposable Gloves", "Cleaning Cloths & Sponges", "Gastronorm Pans & Lids"], brand: "ChefGear Wholesale" },
 }), []);
@@ -147,7 +147,13 @@ const displayedProducts = useMemo(() => {
                   <div className="bulk-grid">
                     {displayedProducts.map(product => (
                       <div key={product.id} className="product-card">
-                        <div className="p-img">{product.image}</div>
+                        <div className="p-img">
+  {product.image.startsWith("http") ? (
+    <img src={product.image} alt={product.name} style={{ width: '100%', height: 'auto' }} />
+  ) : (
+    product.image
+  )}
+</div>
                         <span className="p-brand">{product.brand}</span>
                         <h4>{product.name}</h4>
                         <div className="p-footer">
