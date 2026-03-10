@@ -18,6 +18,17 @@ export default function WholesalePortal() {
   const [activeSub, setActiveSub] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isRibbonVisible, setIsRibbonVisible] = useState(false);
+  // ✅ FILTER & SORT STATE
+const [showFilters, setShowFilters] = useState(false);
+const [activeFilters, setActiveFilters] = useState<{
+  inStockOnly: boolean;
+  priceRange: 'all' | 'under-100' | '100-500' | '500-2000' | 'above-2000';
+  sortBy: 'default' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
+}>({
+  inStockOnly: false,
+  priceRange: 'all',
+  sortBy: 'default'
+});
   const categoryGridRef = useRef<HTMLDivElement>(null);
   const scrollThresholdRef = useRef(0);
 
@@ -65,26 +76,50 @@ const availableSubs = useMemo(() => {
 }, [activeCategory, wholesaleData]);
 
   // ✅ IMPROVED: Show all products in category if no sub selected
+// ✅ IMPROVED: Show all products in category with Filters + Sorting
 const displayedProducts = useMemo(() => {
   if (!activeCategory) return [];
   
-  // Get the VALID sub-categories for this category from wholesaleData
   const validSubs = wholesaleData[activeCategory].subs;
   
   // Start with all products in the active category
   let products = WHOLESALE_INVENTORY.filter(p => p.category === activeCategory);
   
   if (activeSub) {
-    // If a specific sub is selected, filter to exact match
     products = products.filter(p => p.sub === activeSub);
   } else {
-    // If NO sub selected, ONLY show products whose 'sub' is in the predefined valid list
-    // This hides products with typos or invalid sub values like "Ales", "Aes", etc.
     products = products.filter(p => validSubs.includes(p.sub));
   }
   
+  // 🔽 APPLY FILTERS
+  if (activeFilters.priceRange !== 'all') {
+    products = products.filter(p => {
+      const price = p.price;
+      switch (activeFilters.priceRange) {
+        case 'under-100': return price < 100;
+        case '100-500': return price >= 100 && price <= 500;
+        case '500-2000': return price > 500 && price <= 2000;
+        case 'above-2000': return price > 2000;
+        default: return true;
+      }
+    });
+  }
+  
+  // 🔽 APPLY SORTING
+  if (activeFilters.sortBy !== 'default') {
+    products = [...products].sort((a, b) => {
+      switch (activeFilters.sortBy) {
+        case 'name-asc': return a.name.localeCompare(b.name);
+        case 'name-desc': return b.name.localeCompare(a.name);
+        case 'price-asc': return a.price - b.price;
+        case 'price-desc': return b.price - a.price;
+        default: return 0;
+      }
+    });
+  }
+  
   return products;
-}, [activeCategory, activeSub, wholesaleData]);
+}, [activeCategory, activeSub, wholesaleData, activeFilters]);
 
   useEffect(() => {
     if (!location) router.replace("/wholesale/select-city");
@@ -194,6 +229,31 @@ const enableDragScroll = (element: HTMLElement | null) => {
     element.removeEventListener('mousemove', onMouseMove);
   };
 };
+
+
+
+// ✅ FILTER HANDLERS
+const handleFilterChange = (key: keyof typeof activeFilters, value: any) => {
+  setActiveFilters(prev => ({ ...prev, [key]: value }));
+};
+
+const resetFilters = () => {
+  setActiveFilters({
+    inStockOnly: false,
+    priceRange: 'all',
+    sortBy: 'default'
+  });
+};
+
+const hasActiveFilters = useMemo(() => {
+  return activeFilters.inStockOnly || 
+         activeFilters.priceRange !== 'all' || 
+         activeFilters.sortBy !== 'default';
+}, [activeFilters]);
+
+
+
+
   if (!location) return null;
 
   return (
@@ -293,9 +353,79 @@ const enableDragScroll = (element: HTMLElement | null) => {
           <div className="product-results">
             {activeCategory ? (
               <>
-                <h2 className="result-title">
-                  {activeSub ? `Showing: ${activeSub}` : `All ${activeCategory}`}
-                </h2>
+                {/* ✅ SECTION HEADER WITH FILTER/SORT BUTTONS */}
+<div className="results-header">
+  <h2 className="result-title" color='#0f172a'>
+    {activeSub ? `Showing: ${activeSub}` : `All ${activeCategory}`}
+  </h2>
+  
+  <div className="filter-sort-controls">
+    {/* FILTER BUTTON */}
+    <div className="filter-dropdown">
+      <button 
+        className={`filter-btn ${hasActiveFilters ? 'has-filters' : ''}`}
+        onClick={() => setShowFilters(!showFilters)}
+      >
+        <span>⚙️</span> Filter
+        {hasActiveFilters && <span className="filter-badge">✓</span>}
+      </button>
+      
+      {/* FILTER DROPDOWN PANEL */}
+      {showFilters && (
+        <div className="filter-panel glass">
+          <div className="filter-section">
+            <label className="filter-label">
+              <input
+                type="checkbox"
+                checked={activeFilters.inStockOnly}
+                onChange={(e) => handleFilterChange('inStockOnly', e.target.checked)}
+              />
+              <span>In Stock Only</span>
+            </label>
+          </div>
+          
+          <div className="filter-section">
+            <span className="filter-label">Price Range</span>
+            <div className="price-options">
+              {(['all', 'under-100', '100-500', '500-2000', 'above-2000'] as const).map(range => (
+                <button
+                  key={range}
+                  className={`price-option ${activeFilters.priceRange === range ? 'active' : ''}`}
+                  onClick={() => handleFilterChange('priceRange', range)}
+                >
+                  {range === 'all' ? 'All Prices' : 
+                   range === 'under-100' ? '< ₹100' :
+                   range === '100-500' ? '₹100-500' :
+                   range === '500-2000' ? '₹500-2K' : '> ₹2K'}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="filter-actions">
+            <button className="reset-btn" onClick={resetFilters}>Reset</button>
+            <button className="apply-btn" onClick={() => setShowFilters(false)}>Apply</button>
+          </div>
+        </div>
+      )}
+    </div>
+    
+    {/* SORT BUTTON */}
+    <div className="sort-dropdown">
+      <select
+        className="sort-select"
+        value={activeFilters.sortBy}
+        onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+      >
+        <option value="default">Sort: Default</option>
+        <option value="name-asc">Name: A → Z</option>
+        <option value="name-desc">Name: Z → A</option>
+        <option value="price-asc">Price: Low → High</option>
+        <option value="price-desc">Price: High → Low</option>
+      </select>
+    </div>
+  </div>
+</div>
                 {displayedProducts.length > 0 ? (
                   <div className="bulk-grid">
                     {displayedProducts.map(product => (
@@ -505,6 +635,7 @@ const enableDragScroll = (element: HTMLElement | null) => {
           font-size: 1.25rem;
           font-weight: 700;
           color: #0f172a;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
           margin: 0;
         }
         
@@ -903,6 +1034,304 @@ const enableDragScroll = (element: HTMLElement | null) => {
   .clear-search:hover {
     background: rgba(71, 85, 105, 0.8);
     color: #f1f5f9;
+  }
+}
+
+
+/* ✅ RESULTS HEADER WITH FILTER/SORT */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.filter-sort-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* 🔽 FILTER BUTTON & DROPDOWN */
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.filter-btn.has-filters {
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.filter-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  width: 280px;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.filter-section {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
+.filter-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #10b981;
+  cursor: pointer;
+}
+
+.price-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.price-option {
+  padding: 0.4rem 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.price-option:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.price-option.active {
+  background: #10b981;
+  border-color: #059669;
+  color: white;
+  font-weight: 600;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.reset-btn,
+.apply-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reset-btn {
+  background: #f1f5f9;
+  border: none;
+  color: #475569;
+}
+
+.reset-btn:hover {
+  background: #e2e8f0;
+}
+
+.apply-btn {
+  background: #10b981;
+  border: none;
+  color: white;
+}
+
+.apply-btn:hover {
+  background: #059669;
+}
+
+/* 🔽 SORT DROPDOWN */
+.sort-dropdown .sort-select {
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: #475569;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  transition: all 0.2s;
+}
+
+.sort-dropdown .sort-select:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.sort-dropdown .sort-select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* ✅ DARK MODE SUPPORT FOR FILTERS */
+@media (prefers-color-scheme: dark) {
+  .result-title {
+    color: #0f172a;
+  }
+  
+  .filter-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+  }
+  
+  .filter-btn:hover {
+    border-color: #10b981;
+    color: #10b981;
+  }
+  
+  .filter-btn.has-filters {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+    color: #6ee7b7;
+  }
+  
+  .filter-panel.glass {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .filter-section {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .filter-label {
+    color: #f1f5f9;
+  }
+  
+  .price-option {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #cbd5e1;
+  }
+  
+  .price-option:hover {
+    border-color: #10b981;
+    color: #6ee7b7;
+  }
+  
+  .price-option.active {
+    background: #10b981;
+    color: white;
+  }
+  
+  .reset-btn {
+    background: rgba(51, 65, 85, 0.8);
+    color: #cbd5e1;
+  }
+  
+  .reset-btn:hover {
+    background: rgba(71, 85, 105, 0.9);
+  }
+  
+  .sort-dropdown .sort-select {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+  }
+}
+
+/* ✅ MOBILE RESPONSIVENESS */
+@media (max-width: 640px) {
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-sort-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .filter-panel {
+    width: 100%;
+    right: auto;
+    left: 0;
   }
 }
       `}</style>
